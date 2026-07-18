@@ -29,7 +29,7 @@ pnpm analyze "키워드1" "키워드2"          # 네이버만
 pnpm analyze --ig --yt "키워드1" "키워드2" # 세 플랫폼 교차 분석
 pnpm analyze --budget                      # 인스타 예산 + 유튜브 쿼터 현황
 
-pnpm web   # http://localhost:5789 — 키워드 입력 후 클릭으로 분석하는 대시보드
+pnpm web   # http://localhost:3000 — 키워드 입력 후 클릭으로 분석하는 대시보드 (PORT로 변경 가능)
 ```
 
 - 인스타는 네이버 **기회점수 상위 5개**, 유튜브는 **상위 10개**만 조회해 예산/쿼터를 보호합니다.

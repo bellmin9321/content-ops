@@ -12,7 +12,7 @@ import {
 
 loadDotenv();
 
-const PORT = Number(process.env.PORT ?? 5789);
+const PORT = Number(process.env.PORT ?? 3000);
 const PUBLIC_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "public");
 
 function sendJson(res: ServerResponse, status: number, body: unknown): void {
