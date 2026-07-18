@@ -4,4 +4,5 @@ export * from "./cache";
 export * from "./stats";
 export * from "./naver";
 export * from "./instagram";
+export * from "./youtube";
 export * from "./metrics";

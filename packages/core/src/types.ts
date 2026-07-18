@@ -1,4 +1,4 @@
-export type Platform = "blog" | "instagram";
+export type Platform = "blog" | "instagram" | "youtube";
 
 /** 네이버 검색광고 + 블로그 검색을 합친 정규화 지표 */
 export interface NaverMetric {
@@ -14,6 +14,18 @@ export interface NaverMetric {
   ratio: number;
   /** 기회점수 = (모바일량 × 모바일비중) / (경쟁강도 + 1) */
   opportunityScore: number;
+}
+
+/** 유튜브 키워드 지표 */
+export interface YoutubeMetric {
+  keyword: string;
+  /** 최근 90일 관련 영상 수 = 공급 (search.list totalResults) */
+  videoCount: number;
+  /** 상위 25개 조회수 중앙값 = 수요 프록시 겸 진입장벽 */
+  medianViews: number;
+  /** 조회수/영상나이(일) 상위 5개 평균 = 신선한 키워드 감지 */
+  velocity: number;
+  fromCache: boolean;
 }
 
 /** 인스타그램 해시태그 지표 */
