@@ -1,28 +1,16 @@
 import { join } from "node:path";
 import {
-  InstagramBudgetError,
   MissingEnvError,
+  analyzeKeywords,
   budgetUsage,
-  getInstagramMetric,
-  getNaverMetrics,
-  getYoutubeMetric,
-  judge,
   loadDotenv,
   quotaUsage,
   repoRoot,
-  type InstagramMetric,
   type Judgement,
-  type NaverMetric,
   type Platform,
-  type YoutubeMetric,
 } from "@content-ops/core";
 import { writeCsv } from "./csv";
 import { renderTable } from "./table";
-
-/** 인스타 해시태그 예산 보호: 네이버 기회점수 상위 N개만 조회 */
-const IG_TOP_N = 5;
-/** 유튜브 쿼터 보호: 네이버 기회점수 상위 N개만 조회 */
-const YT_TOP_N = 10;
 
 const PLATFORM_ICONS: Record<Platform, string> = {
   blog: "📝",
@@ -70,14 +58,6 @@ function printBudget(): void {
   console.log(`  유튜브: 오늘 쿼터 사용량(추정) ${yt.usedToday}/${yt.limit} 유닛`);
 }
 
-interface Row {
-  keyword: string;
-  naver: NaverMetric;
-  instagram?: InstagramMetric;
-  youtube?: YoutubeMetric;
-  judgement: Judgement;
-}
-
 function fmt(n: number, digits = 0): string {
   if (!Number.isFinite(n)) return "∞";
   return n.toLocaleString("ko-KR", { maximumFractionDigits: digits });
@@ -96,47 +76,12 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  console.log(`🔍 네이버 지표 조회 중... (${options.keywords.length}개 키워드)`);
-  const naverMetrics = await getNaverMetrics(options.keywords);
-  const sorted = [...naverMetrics].sort((a, b) => b.opportunityScore - a.opportunityScore);
-
-  const igMetrics = new Map<string, InstagramMetric>();
-  if (options.ig) {
-    const targets = sorted.slice(0, IG_TOP_N);
-    console.log(`📸 인스타 지표 조회 중... (기회점수 상위 ${targets.length}개)`);
-    for (const m of targets) {
-      try {
-        igMetrics.set(m.keyword, await getInstagramMetric(m.keyword));
-      } catch (e) {
-        if (e instanceof InstagramBudgetError) {
-          console.warn(`  ⚠️ ${e.message}`);
-          continue;
-        }
-        throw e;
-      }
-    }
-  }
-
-  const ytMetrics = new Map<string, YoutubeMetric>();
-  if (options.yt) {
-    const targets = sorted.slice(0, YT_TOP_N);
-    console.log(`🎬 유튜브 지표 조회 중... (기회점수 상위 ${targets.length}개)`);
-    for (const m of targets) {
-      ytMetrics.set(m.keyword, await getYoutubeMetric(m.keyword));
-    }
-  }
-
-  const rows: Row[] = sorted.map((naver) => {
-    const instagram = igMetrics.get(naver.keyword);
-    const youtube = ytMetrics.get(naver.keyword);
-    return {
-      keyword: naver.keyword,
-      naver,
-      instagram,
-      youtube,
-      judgement: judge(naver, instagram, youtube),
-    };
+  const { rows, warnings } = await analyzeKeywords(options.keywords, {
+    ig: options.ig,
+    yt: options.yt,
+    onProgress: (m) => console.log(`🔍 ${m}`),
   });
+  for (const w of warnings) console.warn(`  ⚠️ ${w}`);
 
   console.log(
     "\n" +
