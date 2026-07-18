@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>content-ops 키워드 대시보드</title>
+<style>
+  :root {
+    --bg: #0f1115; --panel: #171a21; --border: #262b36;
+    --text: #e8eaf0; --muted: #8b93a5; --accent: #4f8cff;
+    --good: #3dd68c; --warn: #ffb454; --bad: #6b7280;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 20px; background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Apple SD Gothic Neo", "Pretendard", sans-serif;
+  }
+  main { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; margin-bottom: 16px;
+  }
+  textarea {
+    width: 100%; min-height: 72px; resize: vertical; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg); color: var(--text);
+    padding: 10px 12px; font-size: 15px; font-family: inherit;
+  }
+  textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+  .controls { display: flex; align-items: center; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  label.chk { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); cursor: pointer; }
+  label.chk input { accent-color: var(--accent); width: 16px; height: 16px; }
+  button {
+    background: var(--accent); color: #fff; border: 0; border-radius: 8px;
+    padding: 10px 22px; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: wait; }
+  .spacer { flex: 1; }
+  #budget { font-size: 13px; color: var(--muted); }
+  #status { font-size: 14px; color: var(--muted); margin: 8px 0; min-height: 20px; }
+  #status.error { color: #ff6b6b; white-space: pre-wrap; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { padding: 9px 10px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  th:first-child, td:first-child { text-align: left; }
+  td.verdict { text-align: left; font-weight: 600; }
+  .fit { color: var(--good); }
+  .skip { color: var(--bad); }
+  details { margin-top: 4px; }
+  summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 6px 0; }
+  .reasons li { font-size: 13px; color: var(--muted); margin: 2px 0; }
+  .tablewrap { overflow-x: auto; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>📈 content-ops</h1>
+  <div class="sub">모바일 검색량은 많은데 경쟁이 적은 키워드를 네이버·인스타·유튜브에서 교차 발굴</div>
+
+  <div class="panel">
+    <textarea id="keywords" placeholder="키워드를 쉼표 또는 줄바꿈으로 구분해 입력&#10;예) 캠핑의자, 홈카페 레시피, 제주 애월 카페"></textarea>
+    <div class="controls">
+      <label class="chk"><input type="checkbox" id="ig" /> 📸 인스타 (상위 5개)</label>
+      <label class="chk"><input type="checkbox" id="yt" /> 🎬 유튜브 (상위 10개)</label>
+      <span class="spacer"></span>
+      <span id="budget"></span>
+      <button id="run">분석 실행</button>
+    </div>
+  </div>
+
+  <div id="status"></div>
+
+  <div class="panel hidden" id="results">
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>키워드</th><th>모바일</th><th>총검색</th><th>발행량</th><th>경쟁강도</th>
+            <th>기회점수</th><th>IG 글/h</th><th>IG 좋아요</th><th>YT 영상수</th>
+            <th>YT 중앙조회</th><th>YT 속도</th><th style="text-align:left">판정</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <details open>
+      <summary>판정 근거</summary>
+      <div id="reasons"></div>
+    </details>
+  </div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const ICONS = { blog: "📝", instagram: "📸", youtube: "🎬" };
+const fmt = (n, d = 0) =>
+  Number.isFinite(n) ? n.toLocaleString("ko-KR", { maximumFractionDigits: d }) : "∞";
+
+async function loadBudget() {
+  try {
+    const r = await fetch("/api/budget").then((r) => r.json());
+    $("budget").textContent =
+      `IG 예산 ${r.instagram.used.length}/${r.instagram.limit} · YT 쿼터 ${r.youtube.usedToday}/${r.youtube.limit}`;
+  } catch { /* 서버 시작 직후 잠깐 실패해도 무시 */ }
+}
+
+async function run() {
+  const keywords = $("keywords").value.split(/[,\n]/).map((k) => k.trim()).filter(Boolean);
+  if (keywords.length === 0) {
+    $("status").className = "error";
+    $("status").textContent = "키워드를 1개 이상 입력해주세요.";
+    return;
+  }
+  const params = new URLSearchParams({ keywords: keywords.join(",") });
+  if ($("ig").checked) params.set("ig", "1");
+  if ($("yt").checked) params.set("yt", "1");
+
+  $("run").disabled = true;
+  $("status").className = "";
+  $("status").textContent = `분석 중... (${keywords.length}개 키워드, 최대 수십 초)`;
+  $("results").classList.add("hidden");
+
+  try {
+    const res = await fetch(`/api/analyze?${params}`);
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
+    render(body);
+    $("status").textContent = body.warnings.length
+      ? `⚠️ ${body.warnings.join(" / ")}`
+      : `완료 — ${body.rows.length}개 키워드`;
+  } catch (e) {
+    $("status").className = "error";
+    $("status").textContent = "❌ " + e.message;
+  } finally {
+    $("run").disabled = false;
+    loadBudget();
+  }
+}
+
+function render({ rows }) {
+  $("tbody").innerHTML = rows.map((r) => {
+    const j = r.judgement;
+    const verdict = j.platforms.length
+      ? `<span class="fit">${j.platforms.map((p) => ICONS[p]).join("")} ${j.verdict}</span>`
+      : `<span class="skip">⏭️ skip</span>`;
+    const cell = (v) => `<td>${v}</td>`;
+    return `<tr>
+      <td>${r.keyword}</td>
+      ${cell(fmt(r.naver.mobileVolume))}${cell(fmt(r.naver.totalVolume))}${cell(fmt(r.naver.blogTotal))}
+      ${cell(fmt(r.naver.ratio, 2))}${cell(fmt(r.naver.opportunityScore, 1))}
+      ${cell(r.instagram ? fmt(r.instagram.postsPerHour, 1) : "-")}
+      ${cell(r.instagram ? fmt(r.instagram.topMedianLikes) : "-")}
+      ${cell(r.youtube ? fmt(r.youtube.videoCount) : "-")}
+      ${cell(r.youtube ? fmt(r.youtube.medianViews) : "-")}
+      ${cell(r.youtube ? fmt(r.youtube.velocity, 1) : "-")}
+      <td class="verdict">${verdict}</td>
+    </tr>`;
+  }).join("");
+
+  $("reasons").innerHTML = rows.map((r) =>
+    `<div><strong style="font-size:13px">${r.keyword}</strong>
+     <ul class="reasons">${r.judgement.reasons.map((x) => `<li>${x}</li>`).join("")}</ul></div>`,
+  ).join("");
+
+  $("results").classList.remove("hidden");
+}
+
+$("run").addEventListener("click", run);
+$("keywords").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) run();
+});
+loadBudget();
+</script>
+</body>
+</html>
