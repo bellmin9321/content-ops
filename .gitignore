@@ -1,0 +1,12 @@
+node_modules/
+.turbo/
+dist/
+
+# 로컬 비밀키
+.env
+
+# provider 캐시(인스타 예산 추적, 유튜브 쿼터 추적 포함)
+.cache/
+
+# CSV 결과물
+out/
