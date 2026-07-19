@@ -118,9 +118,27 @@ const ICONS = { blog: "📝", instagram: "📸", youtube: "🎬" };
 const fmt = (n, d = 0) =>
   Number.isFinite(n) ? n.toLocaleString("ko-KR", { maximumFractionDigits: d }) : "∞";
 
+// 배포 환경에서 DASHBOARD_TOKEN이 설정된 경우: 401이면 토큰을 물어보고 재시도
+async function apiFetch(path) {
+  const headers = {};
+  const saved = localStorage.getItem("dashboardToken");
+  if (saved) headers["x-dashboard-token"] = saved;
+  let res = await fetch(path, { headers });
+  if (res.status === 401) {
+    const token = prompt("대시보드 접근 토큰을 입력하세요");
+    if (token) {
+      localStorage.setItem("dashboardToken", token);
+      res = await fetch(path, { headers: { "x-dashboard-token": token } });
+    }
+  }
+  return res;
+}
+
 async function loadBudget() {
   try {
-    const r = await fetch("/api/budget").then((r) => r.json());
+    const res = await apiFetch("/api/budget");
+    const r = await res.json();
+    if (!res.ok) return;
     $("budget").textContent =
       `IG 예산 ${r.instagram.used.length}/${r.instagram.limit} · YT 쿼터 ${r.youtube.usedToday}/${r.youtube.limit}`;
   } catch { /* 서버 시작 직후 잠깐 실패해도 무시 */ }
@@ -143,7 +161,7 @@ async function run() {
   $("results").classList.add("hidden");
 
   try {
-    const res = await fetch(`/api/analyze?${params}`);
+    const res = await apiFetch(`/api/analyze?${params}`);
     const body = await res.json();
     if (!res.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
     render(body);
