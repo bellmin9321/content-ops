@@ -1,12 +1,15 @@
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { budgetUsage, quotaUsage } from "@content-ops/core";
-import { checkAuth, errorResponse } from "./_auth.js";
+import { checkAuth, sendError, sendJson } from "./_auth.js";
 
-export async function GET(request: Request): Promise<Response> {
-  const denied = checkAuth(request);
-  if (denied) return denied;
+export default async function handler(
+  req: IncomingMessage,
+  res: ServerResponse,
+): Promise<void> {
+  if (!checkAuth(req, res)) return;
   try {
-    return Response.json({ instagram: budgetUsage(), youtube: quotaUsage() });
+    sendJson(res, 200, { instagram: budgetUsage(), youtube: quotaUsage() });
   } catch (e) {
-    return errorResponse(e);
+    sendError(res, e);
   }
 }
