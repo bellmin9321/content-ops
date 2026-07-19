@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { repoRoot } from "./env";
+import { repoRoot } from "./env.js";
 
 /**
  * 캐시 디렉토리: <repo root>/.cache (CONTENT_OPS_CACHE_DIR로 재정의 가능).

@@ -1,9 +1,9 @@
-import { InstagramBudgetError } from "./instagram";
-import { getInstagramMetric } from "./instagram";
-import { judge, type Judgement } from "./metrics";
-import { getNaverMetrics } from "./naver";
-import type { InstagramMetric, NaverMetric, YoutubeMetric } from "./types";
-import { getYoutubeMetric } from "./youtube";
+import { InstagramBudgetError } from "./instagram.js";
+import { getInstagramMetric } from "./instagram.js";
+import { judge, type Judgement } from "./metrics.js";
+import { getNaverMetrics } from "./naver.js";
+import type { InstagramMetric, NaverMetric, YoutubeMetric } from "./types.js";
+import { getYoutubeMetric } from "./youtube.js";
 
 /** 인스타 해시태그 예산 보호: 네이버 기회점수 상위 N개만 조회 */
 export const IG_TOP_N = 5;

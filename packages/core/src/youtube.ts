@@ -1,7 +1,7 @@
-import { DAY_MS, HOUR_MS, isFresh, loadCache, saveCache } from "./cache";
-import { requireEnv } from "./env";
-import { average, median } from "./stats";
-import type { YoutubeMetric } from "./types";
+import { DAY_MS, HOUR_MS, isFresh, loadCache, saveCache } from "./cache.js";
+import { requireEnv } from "./env.js";
+import { average, median } from "./stats.js";
+import type { YoutubeMetric } from "./types.js";
 
 const API_BASE = "https://www.googleapis.com/youtube/v3";
 const CACHE_FILE = "youtube.json";

@@ -9,8 +9,8 @@ import {
   type Judgement,
   type Platform,
 } from "@content-ops/core";
-import { writeCsv } from "./csv";
-import { renderTable } from "./table";
+import { writeCsv } from "./csv.js";
+import { renderTable } from "./table.js";
 
 const PLATFORM_ICONS: Record<Platform, string> = {
   blog: "📝",
