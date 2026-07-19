@@ -118,6 +118,15 @@ const ICONS = { blog: "📝", instagram: "📸", youtube: "🎬" };
 const fmt = (n, d = 0) =>
   Number.isFinite(n) ? n.toLocaleString("ko-KR", { maximumFractionDigits: d }) : "∞";
 
+// ?token=값으로 접속하면 자동 저장 → 북마크해두면 입력창 없이 인증
+{
+  const urlToken = new URLSearchParams(location.search).get("token");
+  if (urlToken) {
+    localStorage.setItem("dashboardToken", urlToken);
+    history.replaceState(null, "", location.pathname); // 주소창에서 토큰 감춤
+  }
+}
+
 // 배포 환경에서 DASHBOARD_TOKEN이 설정된 경우: 401이면 토큰을 물어보고 재시도
 async function apiFetch(path) {
   const headers = {};
