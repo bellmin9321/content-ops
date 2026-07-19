@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "analyze": "tsx src/index.ts",
+    "analyze": "pnpm --filter @content-ops/core run build && tsx src/index.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
