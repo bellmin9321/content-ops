@@ -29,6 +29,7 @@
   }
   textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
   .controls { display: flex; align-items: center; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .chks { display: flex; gap: 16px; }
   label.chk { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--muted); cursor: pointer; }
   label.chk input { accent-color: var(--accent); width: 16px; height: 16px; }
   button {
@@ -50,8 +51,25 @@
   details { margin-top: 4px; }
   summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 6px 0; }
   .reasons li { font-size: 13px; color: var(--muted); margin: 2px 0; }
-  .tablewrap { overflow-x: auto; }
+  .tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .hidden { display: none; }
+
+  /* 모바일: 컨트롤 세로 배치, 버튼 전체 폭, 표는 첫 컬럼 고정 후 가로 스크롤 */
+  @media (max-width: 640px) {
+    body { padding: 16px 12px; }
+    h1 { font-size: 19px; }
+    .sub { font-size: 12px; margin-bottom: 16px; }
+    .panel { padding: 14px; border-radius: 10px; }
+    textarea { font-size: 16px; } /* iOS 자동 확대 방지 */
+    .controls { flex-direction: column; align-items: stretch; gap: 10px; }
+    .spacer { display: none; }
+    #budget { order: 1; }
+    button { width: 100%; padding: 13px; }
+    th, td { padding: 7px 8px; font-size: 13px; }
+    th:first-child, td:first-child {
+      position: sticky; left: 0; background: var(--panel);
+    }
+  }
 </style>
 </head>
 <body>
@@ -62,8 +80,10 @@
   <div class="panel">
     <textarea id="keywords" placeholder="키워드를 쉼표 또는 줄바꿈으로 구분해 입력&#10;예) 캠핑의자, 홈카페 레시피, 제주 애월 카페"></textarea>
     <div class="controls">
-      <label class="chk"><input type="checkbox" id="ig" /> 📸 인스타 (상위 5개)</label>
-      <label class="chk"><input type="checkbox" id="yt" /> 🎬 유튜브 (상위 10개)</label>
+      <div class="chks">
+        <label class="chk"><input type="checkbox" id="ig" /> 📸 인스타 (상위 5개)</label>
+        <label class="chk"><input type="checkbox" id="yt" /> 🎬 유튜브 (상위 10개)</label>
+      </div>
       <span class="spacer"></span>
       <span id="budget"></span>
       <button id="run">분석 실행</button>
