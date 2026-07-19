@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "",
+  "buildCommand": "pnpm --filter @content-ops/core run build",
   "outputDirectory": "public"
 }

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx src/server.ts",
+    "dev": "pnpm --filter @content-ops/core run build && tsx src/server.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
