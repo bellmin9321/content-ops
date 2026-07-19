@@ -8,6 +8,7 @@
   },
   "scripts": {
     "analyze": "pnpm --filter @content-ops/cli run analyze",
+    "web": "pnpm --filter @content-ops/web run dev",
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {

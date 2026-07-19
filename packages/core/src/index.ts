@@ -6,3 +6,4 @@ export * from "./naver";
 export * from "./instagram";
 export * from "./youtube";
 export * from "./metrics";
+export * from "./analyze";

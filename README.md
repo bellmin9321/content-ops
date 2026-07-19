@@ -13,8 +13,10 @@ packages/
     instagram.ts  Graph API 해시태그 2단계 조회 + 7일 예산 추적
     youtube.ts    Data API v3 + 일일 쿼터 추적
     metrics.ts    3플랫폼 교차 판정 (JUDGE_THRESHOLDS 상수로 기준 조정)
+    analyze.ts    오케스트레이션 (정렬 + 상위 N개 선별, CLI/웹 공유)
     types.ts      정규화된 Metric 인터페이스
   cli/    얇은 진입점 (tsx 실행, 표 출력 + BOM CSV 저장)
+  web/    로컬 대시보드 (Node 내장 http + 정적 HTML, 의존성 없음)
 ```
 
 ## 시작하기
@@ -26,6 +28,8 @@ cp .env.example .env   # 아래 발급 절차대로 키를 채운다
 pnpm analyze "키워드1" "키워드2"          # 네이버만
 pnpm analyze --ig --yt "키워드1" "키워드2" # 세 플랫폼 교차 분석
 pnpm analyze --budget                      # 인스타 예산 + 유튜브 쿼터 현황
+
+pnpm web   # http://localhost:3000 — 키워드 입력 후 클릭으로 분석하는 대시보드 (PORT로 변경 가능)
 ```
 
 - 인스타는 네이버 **기회점수 상위 5개**, 유튜브는 **상위 10개**만 조회해 예산/쿼터를 보호합니다.
