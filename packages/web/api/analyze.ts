@@ -1,5 +1,5 @@
 import { analyzeKeywords } from "@content-ops/core";
-import { checkAuth, errorResponse } from "./_auth";
+import { checkAuth, errorResponse } from "./_auth.js";
 
 export async function GET(request: Request): Promise<Response> {
   const denied = checkAuth(request);

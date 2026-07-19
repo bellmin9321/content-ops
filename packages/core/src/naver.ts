@@ -1,7 +1,7 @@
 import { createHmac } from "node:crypto";
-import { requireEnv } from "./env";
-import { chunk, sleep } from "./stats";
-import type { NaverMetric } from "./types";
+import { requireEnv } from "./env.js";
+import { chunk, sleep } from "./stats.js";
+import type { NaverMetric } from "./types.js";
 
 const AD_API_BASE = "https://api.searchad.naver.com";
 const KEYWORDTOOL_PATH = "/keywordstool";

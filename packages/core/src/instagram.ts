@@ -1,7 +1,7 @@
-import { DAY_MS, HOUR_MS, isFresh, loadCache, saveCache } from "./cache";
-import { requireEnv } from "./env";
-import { median } from "./stats";
-import type { InstagramMetric } from "./types";
+import { DAY_MS, HOUR_MS, isFresh, loadCache, saveCache } from "./cache.js";
+import { requireEnv } from "./env.js";
+import { median } from "./stats.js";
+import type { InstagramMetric } from "./types.js";
 
 const GRAPH_BASE = "https://graph.facebook.com/v21.0";
 const CACHE_FILE = "instagram.json";

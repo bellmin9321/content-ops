@@ -1,4 +1,4 @@
-import type { InstagramMetric, NaverMetric, Platform, YoutubeMetric } from "./types";
+import type { InstagramMetric, NaverMetric, Platform, YoutubeMetric } from "./types.js";
 
 /** 판정 기준 — 운영하며 조정하는 값이므로 상수로 분리 */
 export const JUDGE_THRESHOLDS = {
