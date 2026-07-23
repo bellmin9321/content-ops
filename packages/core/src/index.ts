@@ -7,3 +7,6 @@ export * from "./instagram.js";
 export * from "./youtube.js";
 export * from "./metrics.js";
 export * from "./analyze.js";
+export * from "./datalab.js";
+export * from "./telegram.js";
+export * from "./format.js";

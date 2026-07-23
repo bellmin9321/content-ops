@@ -9,6 +9,7 @@
   "scripts": {
     "analyze": "pnpm --filter @content-ops/cli run analyze",
     "web": "pnpm --filter @content-ops/web run dev",
+    "report": "pnpm --filter @content-ops/cli run report",
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {

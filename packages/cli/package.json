@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "analyze": "pnpm --filter @content-ops/core run build && tsx src/index.ts",
+    "report": "pnpm --filter @content-ops/core run build && tsx src/report.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
