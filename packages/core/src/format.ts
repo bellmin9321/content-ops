@@ -42,7 +42,7 @@ export function formatAnalysisMessage(rows: KeywordReport[], warnings: string[])
 }
 
 /** 일일 리포트에서 상세히 보여줄 추천 키워드 수 */
-export const DAILY_RECOMMEND_COUNT = 3;
+export const DAILY_RECOMMEND_COUNT = 10;
 
 function spikeLabel(ratio: number | undefined): string {
   if (ratio === undefined) return "";
